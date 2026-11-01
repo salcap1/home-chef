@@ -1,0 +1,2 @@
+ALTER TABLE "grocery_product_preferences" ADD COLUMN "source" text DEFAULT 'cart_add' NOT NULL;--> statement-breakpoint
+ALTER TABLE "grocery_product_preferences" ADD COLUMN "brand_locked" boolean DEFAULT false NOT NULL;
