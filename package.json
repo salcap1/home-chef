@@ -18,7 +18,6 @@
     "db:push": "drizzle-kit push",
     "db:studio": "drizzle-kit studio",
     "household:create": "tsx --env-file=.env.local scripts/create-household.ts",
-
     "prepare": "husky"
   },
   "dependencies": {
