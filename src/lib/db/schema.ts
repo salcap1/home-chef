@@ -100,6 +100,11 @@ export const households = pgTable(
       precision: 12,
       scale: 2,
     }),
+    /**
+     * Lifetime user chef-chat message cap for demo / self-signup kitchens.
+     * Null = unlimited (script-created full kitchens). Non-null also disables HT Shop.
+     */
+    aiChatLifetimeLimit: integer("ai_chat_lifetime_limit"),
     ...timestamps,
   },
   (table) => [

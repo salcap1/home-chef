@@ -1,6 +1,9 @@
 import { and, count, eq, gte, sql } from "drizzle-orm";
 
-import { getHouseholdMonthlyBudgetUsd } from "@/lib/household/accounts";
+import {
+  getHouseholdAiChatLifetimeLimit,
+  getHouseholdMonthlyBudgetUsd,
+} from "@/lib/household/accounts";
 import { getDb } from "@/lib/db";
 import { aiUsage, conversationMessages } from "@/lib/db/schema";
 import { getEnv } from "@/lib/env";
@@ -11,7 +14,8 @@ export type AiBudgetCode =
   | "household_budget"
   | "global_budget"
   | "rate_limit_hour"
-  | "rate_limit_day";
+  | "rate_limit_day"
+  | "demo_chat_limit";
 
 export class AiBudgetExceededError extends Error {
   readonly code: AiBudgetCode;
@@ -82,9 +86,25 @@ async function countUserChatMessagesSince(
   return Number(rows[0]?.value ?? 0);
 }
 
+async function countUserChatMessagesAllTime(
+  householdId: string,
+): Promise<number> {
+  const db = getDb();
+  const rows = await db
+    .select({ value: count() })
+    .from(conversationMessages)
+    .where(
+      and(
+        eq(conversationMessages.householdId, householdId),
+        eq(conversationMessages.role, "user"),
+      ),
+    );
+  return Number(rows[0]?.value ?? 0);
+}
+
 /**
  * Hard gate before any paid model call.
- * Chat also enforces hourly/daily message caps for the household.
+ * Chat also enforces hourly/daily message caps and demo lifetime caps.
  */
 export async function assertAiAllowed(
   householdId: string,
@@ -94,6 +114,17 @@ export async function assertAiAllowed(
   const env = getEnv();
 
   if (kind === "chat") {
+    const lifetimeLimit = await getHouseholdAiChatLifetimeLimit(householdId);
+    if (lifetimeLimit != null) {
+      const lifetime = await countUserChatMessagesAllTime(householdId);
+      if (lifetime >= lifetimeLimit) {
+        throw new AiBudgetExceededError(
+          "demo_chat_limit",
+          `This demo kitchen’s ${lifetimeLimit} chef messages are used up.`,
+        );
+      }
+    }
+
     const hourAgo = new Date(now.getTime() - 60 * 60 * 1000);
     const dayAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000);
     const [hourly, daily] = await Promise.all([

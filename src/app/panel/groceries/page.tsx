@@ -25,7 +25,9 @@ export default async function GroceriesPage() {
           isDefault: category.isDefault,
           sortOrder: category.sortOrder,
         }))}
-        harrisTeeterLinked={harrisTeeter.linked}
+        harrisTeeterLinked={
+          harrisTeeter.available === true && harrisTeeter.linked
+        }
       />
     </PanelShell>
   );

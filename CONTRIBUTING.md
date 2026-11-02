@@ -5,10 +5,13 @@ Thanks for taking an interest in Household Chef.
 ## Development setup
 
 1. Fork and clone the repo
-2. Copy `.env.example` to `.env.local` and fill in required values (see README)
-3. `npm install`
-4. Apply migrations: `node --env-file=.env.local ./node_modules/drizzle-kit/bin.cjs migrate`
-5. `npm run dev`
+2. Create your **own** Neon Postgres database (do not use someone else’s `DATABASE_URL`)
+3. Copy `.env.example` to `.env.local` and fill in: your `DATABASE_URL`, a new `WEB_PANEL_SESSION_KEY` (`openssl rand -base64 32`), and your AI Gateway key
+4. For Harris Teeter Shop, register **your own** Kroger developer app and set `KROGER_*` — never reuse another deploy’s secrets
+5. `npm install`
+6. Apply migrations: `node --env-file=.env.local ./node_modules/drizzle-kit/bin.cjs migrate`
+7. `npm run dev` — use **Create account** for a demo kitchen, or `npm run household:create` for a full kitchen (Shop + no lifetime chat cap)
+8. Do **not** run `npm run dev:vercel` unless you own the Vercel project (it overwrites `.env.local` with host secrets)
 
 ## Workflow
 

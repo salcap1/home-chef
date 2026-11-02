@@ -12,6 +12,7 @@ import {
   getRecipeById,
 } from "@/lib/meals/service";
 import { getMonthlyCostSummary } from "@/lib/conversation/service";
+import { canUseHarrisTeeterShop } from "@/lib/kroger/access";
 import { getKrogerConnection } from "@/lib/kroger/connection";
 import {
   listPanelMeatOptions,
@@ -26,28 +27,35 @@ export async function loadPanelHouseholdId(): Promise<string> {
 
 export async function loadGroceries() {
   const householdId = await loadPanelHouseholdId();
-  const [active, categories, kroger] = await Promise.all([
+  const [active, categories, kroger, shopAllowed] = await Promise.all([
     getActiveGroceryList(householdId),
     listGroceryCategories(householdId),
     getKrogerConnection(householdId),
+    canUseHarrisTeeterShop(householdId),
   ]);
+  const harrisTeeter = !shopAllowed
+    ? ({ available: false as const } as const)
+    : kroger
+      ? ({
+          available: true as const,
+          linked: true as const,
+          locationName: kroger.locationName,
+        } as const)
+      : ({ available: true as const, linked: false as const } as const);
+
   if (!active) {
     return {
       list: null,
       items: [],
       categories,
-      harrisTeeter: kroger
-        ? { linked: true as const, locationName: kroger.locationName }
-        : { linked: false as const },
+      harrisTeeter,
     };
   }
   return {
     list: active.list,
     items: active.items,
     categories,
-    harrisTeeter: kroger
-      ? { linked: true as const, locationName: kroger.locationName }
-      : { linked: false as const },
+    harrisTeeter,
   };
 }
 

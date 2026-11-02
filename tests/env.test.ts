@@ -11,6 +11,7 @@ const KEYS = [
   "AI_GLOBAL_MONTHLY_BUDGET_USD",
   "AI_CHAT_HOURLY_LIMIT",
   "AI_CHAT_DAILY_LIMIT",
+  "AI_SELF_SIGNUP_CHAT_LIMIT",
   "HOUSEHOLD_NAME",
   "HOUSEHOLD_TIMEZONE",
   "WEB_PANEL_SESSION_KEY",
@@ -42,6 +43,7 @@ describe("getEnv", () => {
     expect(env.AI_MONTHLY_BUDGET_USD).toBe(5);
     expect(env.AI_CHAT_HOURLY_LIMIT).toBe(10);
     expect(env.AI_CHAT_DAILY_LIMIT).toBe(40);
+    expect(env.AI_SELF_SIGNUP_CHAT_LIMIT).toBe(3);
     expect(env.HOUSEHOLD_NAME).toBe("Home");
     expect(env.HOUSEHOLD_TIMEZONE).toBe("America/New_York");
     expect(env.AI_GLOBAL_MONTHLY_BUDGET_USD).toBeUndefined();

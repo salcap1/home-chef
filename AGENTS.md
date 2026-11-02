@@ -248,13 +248,15 @@ Also set a spend limit on the Vercel AI Gateway dashboard as a last line of defe
 
 # 6. Authentication and Security
 
-This is a private household application (invite-only), even if the git repo is public.
+The git repo may be public. Protect `/panel` with **passcode accounts**: each passcode is one kitchen (`households.passcode_lookup` = HMAC of the passcode with `WEB_PANEL_SESSION_KEY`). No username. The signed session cookie embeds `householdId` so all panel data is scoped to that kitchen.
 
-Protect `/panel` with **passcode accounts**: each passcode is one kitchen (`households.passcode_lookup` = HMAC of the passcode with `WEB_PANEL_SESSION_KEY`). No username. The signed session cookie (`WEB_PANEL_SESSION_KEY`) embeds `householdId` so all panel data is scoped to that kitchen.
+**Create account** on `/login` is public self-signup. UI-created kitchens are **demo kitchens**: `households.ai_chat_lifetime_limit` is set from `AI_SELF_SIGNUP_CHAT_LIMIT` (default 3). Demo kitchens cannot use Harris Teeter Shop / Kroger OAuth. Also enforce site-wide `AI_GLOBAL_MONTHLY_BUDGET_USD` on shared deploys.
 
-Provision kitchens with `scripts/create-household.ts` (optional per-kitchen `monthly_budget_usd`). Do not offer public self-signup while you pay for AI.
+**Full kitchens** (unlimited chat subject to monthly $ + rate limits, Shop allowed): provision with `scripts/create-household.ts` (optional per-kitchen `monthly_budget_usd`). `ai_chat_lifetime_limit` stays null.
 
 Optional `WEB_PANEL_SECRET`: one-time bootstrap — first login matching it claims the oldest household that still has a null `passcode_lookup`.
+
+Forks and local contributors must use their **own** Neon `DATABASE_URL`, `WEB_PANEL_SESSION_KEY`, AI Gateway auth, and (for Shop) Kroger developer app credentials. Do not point local env at production Neon or reuse production Kroger secrets. Do not run `npm run dev:vercel` unless you own the Vercel project.
 
 Both people in the same kitchen share that kitchen’s:
 

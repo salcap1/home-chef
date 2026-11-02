@@ -162,6 +162,7 @@ export async function getKrogerConnection(householdId: string) {
   return rows[0] ?? null;
 }
 
+/** Always scoped to this kitchen’s kroger_connections row — never a global token. */
 export async function getValidKrogerAccessToken(
   householdId: string,
 ): Promise<{ accessToken: string; locationId: string; locationName: string | null } | null> {

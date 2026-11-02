@@ -48,6 +48,8 @@ export async function createHouseholdWithPasscode(input: {
   passcode: string;
   sessionPepper: string;
   monthlyBudgetUsd?: number | null;
+  /** Null/omit = full kitchen. Set for UI self-signup demo caps. */
+  aiChatLifetimeLimit?: number | null;
 }): Promise<{ id: string; passcodeLookup: string }> {
   const passcodeLookup = computePasscodeLookup(
     input.passcode,
@@ -69,6 +71,7 @@ export async function createHouseholdWithPasscode(input: {
         input.monthlyBudgetUsd != null
           ? String(input.monthlyBudgetUsd)
           : null,
+      aiChatLifetimeLimit: input.aiChatLifetimeLimit ?? null,
     })
     .returning({ id: households.id });
 
@@ -77,6 +80,25 @@ export async function createHouseholdWithPasscode(input: {
   }
 
   return { id: created.id, passcodeLookup };
+}
+
+/** Demo / self-signup kitchens have a non-null lifetime chat cap. */
+export async function getHouseholdAiChatLifetimeLimit(
+  householdId: string,
+): Promise<number | null> {
+  const db = getDb();
+  const rows = await db
+    .select({ aiChatLifetimeLimit: households.aiChatLifetimeLimit })
+    .from(households)
+    .where(eq(households.id, householdId))
+    .limit(1);
+  const value = rows[0]?.aiChatLifetimeLimit;
+  return value == null ? null : value;
+}
+
+export async function isDemoKitchen(householdId: string): Promise<boolean> {
+  const limit = await getHouseholdAiChatLifetimeLimit(householdId);
+  return limit != null;
 }
 
 export async function setHouseholdPasscode(input: {

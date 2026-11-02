@@ -15,4 +15,13 @@ describe("AiBudgetExceededError", () => {
     expect(isAiBudgetExceededError(new Error("nope"))).toBe(false);
     expect(error.code).toBe("household_budget");
   });
+
+  it("supports demo_chat_limit code", () => {
+    const error = new AiBudgetExceededError(
+      "demo_chat_limit",
+      "This demo kitchen’s 3 chef messages are used up.",
+    );
+    expect(isAiBudgetExceededError(error)).toBe(true);
+    expect(error.code).toBe("demo_chat_limit");
+  });
 });

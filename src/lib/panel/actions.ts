@@ -35,6 +35,7 @@ import {
 import { addDaysToIsoDate, mondayOfWeek } from "@/lib/grocery/calculate";
 import { getEnv } from "@/lib/env";
 import { generateMealBatchTitles } from "@/lib/ai/meal-batch";
+import { assertHarrisTeeterAllowed } from "@/lib/kroger/access";
 import {
   buildKrogerLinkUrl,
   createKrogerOAuthState,
@@ -59,6 +60,21 @@ export async function loginAction(formData: FormData) {
   const ok = await loginWithPasscode(passcode);
   if (!ok) {
     redirect(`/login?error=1&next=${encodeURIComponent(next)}`);
+  }
+
+  redirect(next.startsWith("/") ? next : "/panel/meals");
+}
+
+export async function createAccountAction(formData: FormData) {
+  const { createAccountWithPasscode } = await import("@/lib/panel/auth");
+  const passcode = String(formData.get("passcode") ?? "");
+  const confirm = String(formData.get("confirm") ?? "");
+  const next = String(formData.get("next") ?? "/panel/meals");
+  const nextQ = encodeURIComponent(next);
+
+  const result = await createAccountWithPasscode(passcode, confirm);
+  if (!result.ok) {
+    redirect(`/login?mode=create&error=${result.error}&next=${nextQ}`);
   }
 
   redirect(next.startsWith("/") ? next : "/panel/meals");
@@ -652,6 +668,7 @@ export async function createHarrisTeeterLinkAction(): Promise<
 > {
   try {
     const { householdId } = await panelContext();
+    await assertHarrisTeeterAllowed(householdId);
     const stateToken = await createKrogerOAuthState(householdId);
     return { ok: true, url: buildKrogerLinkUrl(stateToken) };
   } catch (error) {
@@ -676,6 +693,7 @@ export async function searchHarrisTeeterProductsAction(
 > {
   try {
     const { householdId } = await panelContext();
+    await assertHarrisTeeterAllowed(householdId);
     const itemId = groceryItemId.trim();
     if (!itemId) {
       return { ok: false, error: "Missing grocery item.", reason: "invalid" };
@@ -754,6 +772,7 @@ export async function addHarrisTeeterProductAction(input: {
 > {
   try {
     const { householdId } = await panelContext();
+    await assertHarrisTeeterAllowed(householdId);
     const itemId = input.groceryItemId.trim();
     const upc = input.upc.trim();
     if (!itemId || !upc) {

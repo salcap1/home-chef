@@ -11,6 +11,11 @@ const envSchema = z.object({
   AI_GLOBAL_MONTHLY_BUDGET_USD: z.coerce.number().positive().optional(),
   AI_CHAT_HOURLY_LIMIT: z.coerce.number().int().positive().default(10),
   AI_CHAT_DAILY_LIMIT: z.coerce.number().int().positive().default(40),
+  /**
+   * Lifetime chef-chat message cap written onto UI self-signup kitchens.
+   * Script-created kitchens leave ai_chat_lifetime_limit null (unlimited).
+   */
+  AI_SELF_SIGNUP_CHAT_LIMIT: z.coerce.number().int().positive().default(3),
   HOUSEHOLD_NAME: z.string().min(1).default("Home"),
   HOUSEHOLD_TIMEZONE: z.string().min(1).default("America/New_York"),
   KROGER_CLIENT_ID: z.string().min(1).optional(),
@@ -43,6 +48,7 @@ export function getEnv(): AppEnv {
     AI_GLOBAL_MONTHLY_BUDGET_USD: process.env.AI_GLOBAL_MONTHLY_BUDGET_USD,
     AI_CHAT_HOURLY_LIMIT: process.env.AI_CHAT_HOURLY_LIMIT,
     AI_CHAT_DAILY_LIMIT: process.env.AI_CHAT_DAILY_LIMIT,
+    AI_SELF_SIGNUP_CHAT_LIMIT: process.env.AI_SELF_SIGNUP_CHAT_LIMIT,
     HOUSEHOLD_NAME: process.env.HOUSEHOLD_NAME,
     HOUSEHOLD_TIMEZONE: process.env.HOUSEHOLD_TIMEZONE,
     KROGER_CLIENT_ID: process.env.KROGER_CLIENT_ID,

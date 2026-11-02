@@ -4,9 +4,10 @@ import { useState, useTransition } from "react";
 
 import { createHarrisTeeterLinkAction } from "@/lib/panel/actions";
 
-type HarrisTeeterStatus =
-  | { linked: true; locationName: string | null }
-  | { linked: false };
+export type HarrisTeeterStatus =
+  | { available: false }
+  | { available: true; linked: true; locationName: string | null }
+  | { available: true; linked: false };
 
 export function GroceryExtrasClient({
   harrisTeeter,
@@ -15,6 +16,10 @@ export function GroceryExtrasClient({
 }) {
   const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
+
+  if (!harrisTeeter.available) {
+    return null;
+  }
 
   function linkAccount() {
     setError(null);

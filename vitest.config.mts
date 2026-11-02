@@ -26,6 +26,7 @@ export default defineConfig({
         "src/lib/household/accounts.ts",
         "src/lib/household/context.ts",
         "src/lib/kitchen/snapshot.ts",
+        "src/lib/kroger/access.ts",
         "src/lib/kroger/client.ts",
         "src/lib/kroger/connection.ts",
         "src/lib/kroger/preferences.ts",

@@ -18,4 +18,11 @@ You should receive an acknowledgment within a few days. Please give reasonable t
 
 ## Scope notes
 
-This app is designed as a private household kitchen tool (passcode-gated panel, Neon Postgres, Vercel AI Gateway, optional Kroger OAuth for Harris Teeter cart add). Reports involving leaked secrets, auth bypass, or cross-household data access are especially welcome.
+Passcode-gated panel (no username), Neon Postgres, Vercel AI Gateway, optional Kroger OAuth for Harris Teeter cart add. Reports involving leaked secrets, auth bypass, or cross-household data access are especially welcome.
+
+### Tenant and secret boundaries
+
+- Cloning the repo alone cannot reach production data: `DATABASE_URL`, `WEB_PANEL_SESSION_KEY`, AI keys, and Kroger credentials live only in host env / local `.env.local` (gitignored).
+- Panel data is scoped by `householdId` in the signed session cookie.
+- Harris Teeter user tokens are per kitchen in `kroger_connections`. Demo (self-signup) kitchens cannot Shop or start Kroger OAuth on a shared deploy.
+- Contributors must use their own Neon, session key, AI auth, and Kroger developer app.
