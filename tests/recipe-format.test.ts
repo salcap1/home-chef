@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import {
   parseIngredientLines,
   parseInstructionSteps,
+  resolveInstructionSteps,
 } from "@/lib/panel/recipe-format";
 
 describe("parseIngredientLines", () => {
@@ -69,6 +70,40 @@ describe("parseInstructionSteps", () => {
     ).toEqual([
       { number: 1, text: "Preheat oven", ingredients: [] },
       { number: 2, text: "Season chicken", ingredients: [] },
+    ]);
+  });
+});
+
+describe("resolveInstructionSteps", () => {
+  it("prefers stored JSONB steps over free text", () => {
+    expect(
+      resolveInstructionSteps({
+        instructionSteps: [
+          {
+            text: "1. From JSON",
+            ingredients: [{ name: "Oil", quantityText: "1 tbsp" }],
+          },
+        ],
+        instructionsText: "1. From text only",
+      }),
+    ).toEqual([
+      {
+        number: 1,
+        text: "From JSON",
+        ingredients: [{ name: "Oil", quantity: "1 tbsp" }],
+      },
+    ]);
+  });
+
+  it("falls back to parsing instructions text", () => {
+    expect(
+      resolveInstructionSteps({
+        instructionSteps: null,
+        instructionsText: "1. Boil water\n2. Add pasta",
+      }),
+    ).toEqual([
+      { number: 1, text: "Boil water", ingredients: [] },
+      { number: 2, text: "Add pasta", ingredients: [] },
     ]);
   });
 });
