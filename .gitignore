@@ -48,3 +48,6 @@ docs/private/
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Next.js may recreate this locally; keep AGENTS.md as the single source
+CLAUDE.md
