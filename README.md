@@ -107,7 +107,7 @@ npm run test
 npm run test:coverage
 ```
 
-Coverage summary is published as a CI job summary and artifact; the in-repo badge lives at `.github/badges/coverage.svg`.
+Coverage focuses on deterministic `src/lib` logic (grocery math, formatting, session/passcode, planning rules). DB/HTTP/server-action modules are excluded from the badge denominator. CI publishes a job summary + artifact; the in-repo badge lives at `.github/badges/coverage.svg`.
 
 ## Harris Teeter (optional)
 

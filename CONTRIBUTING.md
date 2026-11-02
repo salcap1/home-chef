@@ -27,7 +27,9 @@ npm run test:coverage
 npm run build
 ```
 
-CI runs the same suite on every pull request.
+Open changes against `main` via pull request (branch protection requires CI + a conventional PR title). Do not push directly to `main` unless you are unblocking a broken release.
+
+CI runs the same suite on every pull request. Coverage measures deterministic `src/lib` helpers; DB/HTTP/action modules are excluded from the badge.
 
 ## Product / agent behavior
 
